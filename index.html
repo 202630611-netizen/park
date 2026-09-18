@@ -122,3 +122,444 @@
     <script src="script.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이지 배출 - 올바른 분리배출 & 실시간 쓰레기통 지도</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1B4332;
+            --primary-light: #2D6A4F;
+            --accent-color: #52B788;
+            --accent-light: #D8F3DC;
+            --bg-light: #F8F9FA;
+            --text-dark: #212529;
+            --text-muted: #6C757D;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #D8F3DC 0%, #B7E4C7 100%);
+            padding: 5rem 2rem;
+            text-align: center;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #E8F5E9;
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title span.badge {
+            background-color: var(--accent-light);
+            color: var(--primary-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        /* Steps Section (신규 프로세스) */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .step-card {
+            background: var(--white);
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            position: relative;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-card.highlight {
+            border: 2px solid var(--accent-color);
+        }
+
+        .step-number {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .step-icon {
+            width: 65px;
+            height: 65px;
+            background: #E8F5E9;
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 10px auto 20px;
+        }
+
+        /* Features Section */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-light);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        /* Interactive Map & Scanner Section */
+        .interactive-box {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 3rem;
+            margin-top: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .map-section {
+            background: linear-gradient(rgba(27, 67, 50, 0.85), rgba(27, 67, 50, 0.85)), url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            border-radius: 30px;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 3rem 2rem;
+            margin-top: 5rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--accent-light);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-leaf"></i> 이지 배출
+            </a>
+            <ul class="nav-links">
+                <li><a href="#process">이용 방법</a></li>
+                <li><a href="#features">기능 소개</a></li>
+                <li><a href="#search">품목 검색</a></li>
+                <li><a href="#map">실시간 쓰레기통 지도</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>쉽고 똑똑한 친환경 습관, 이지 배출 🌱</h1>
+        <p>사진 스캔 분석부터 실시간 전국 쓰레기통 위치 등록까지!<br>지구를 지키는 가장 완벽한 올바른 분리배출 가이드</p>
+        <div class="hero-btn-group">
+            <a href="#process" class="btn btn-primary"><i class="fa-solid fa-camera"></i> 쓰레기 스캔 시작</a>
+            <a href="#map" class="btn btn-secondary"><i class="fa-solid fa-map-pin"></i> 실시간 쓰레기통 지도</a>
+        </div>
+    </section>
+
+    <!-- Step Process Section (신규 핵심 기능 프로세스) -->
+    <div class="container" id="process">
+        <div class="section-title">
+            <span class="badge">EASY PROCESS</span>
+            <h2>이지 배출 이용 순서</h2>
+            <p>스캔부터 등록까지 4단계로 한 번에 해결하세요.</p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">STEP 01</div>
+                <div class="step-icon"><i class="fa-solid fa-camera"></i></div>
+                <h3>쓰레기 사진 스캔</h3>
+                <p>버리고 싶은 쓰레기의 사진을 찍거나 바코드를 스캔합니다.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">STEP 02</div>
+                <div class="step-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                <h3>소재 및 종류 분석</h3>
+                <p>AI가 소재와 오염도를 분석하여 정확한 쓰레기 종류를 판단합니다.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">STEP 03</div>
+                <div class="step-icon"><i class="fa-solid fa-recycle"></i></div>
+                <h3>맞춤 배출하기</h3>
+                <p>안내된 세척법 및 동네별 규정에 맞게 깔끔하게 배출합니다.</p>
+            </div>
+
+            <div class="step-card highlight">
+                <div class="step-number">STEP 04</div>
+                <div class="step-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                <h3>실시간 위치 등록 Complete</h3>
+                <p>전국 쓰레기통 위치를 확인하고 새 쓰레기통을 지도에 실시간 등록합니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container" id="features">
+        <div class="section-title">
+            <span class="badge">FEATURES</span>
+            <h2>스마트 핵심 기능</h2>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-barcode"></i></div>
+                <h3>바코드 세척 가이드</h3>
+                <p>식품/제품 바코드 스캔 시 해당 상품 맞춤 세척 및 라벨 분리법을 표시합니다.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-building-flag"></i></div>
+                <h3>지자체별 배출 정보</h3>
+                <p>지역마다 다른 배출 요일, 시간, 종량제 봉투 규격, 대형 폐기물 신고를 안내합니다.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                <h3>어려운 품목 검색</h3>
+                <p>애매한 품목명을 질문하거나 검색하면 즉시 맞춤 답변을 제공합니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Search Section -->
+    <div class="container" id="search">
+        <div class="interactive-box">
+            <div class="section-title">
+                <h2>어려운 품목명 검색</h2>
+                <p>헷갈리는 쓰레기 이름을 검색해보세요.</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="예: 코팅 전단지, 젤 아이스팩, 깨진 도자기...">
+                <button class="btn btn-primary" onclick="searchItem()"><i class="fa-solid fa-magnifying-glass"></i> 검색</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Trash Bin Map Section -->
+    <div class="container" id="map">
+        <div class="map-section">
+            <h2>📍 전국 쓰레기통 실시간 위치 등록 완료!</h2>
+            <p>내 주변 쓰레기통 찾기부터 실시간 위치 등록까지 함께 참여해보세요.</p>
+            <br>
+            <button class="btn btn-secondary" onclick="registerTrashBin()">
+                <i class="fa-solid fa-plus"></i> 새 쓰레기통 위치 실시간 등록하기
+            </button>
+        </div>
+    </footer>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 이지 배출 (Easy Discharge). All rights reserved.</p>
+        <p>🌿 깨끗한 환경을 만들어가는 스마트 분리배출 플랫폼</p>
+    </footer>
+
+    <script>
+        function searchItem() {
+            const input = document.getElementById('searchInput').value;
+            if(input.trim() === "") {
+                alert("검색할 품목명을 입력해주세요!");
+            } else {
+                alert(`'${input}' 배출 가이드: 소재 및 지자체 규정에 따른 배출 방법을 확인합니다.`);
+            }
+        }
+
+        function registerTrashBin() {
+            alert("현재 GPS 위치를 기반으로 전국 쓰레기통 실시간 지도 등록을 진행합니다.");
+        }
+    </script>
+</body>
+</html>
